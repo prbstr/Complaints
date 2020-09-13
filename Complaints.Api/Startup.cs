@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Complaints.Core.Complaint;
 using Complaints.Core.User;
 using Complaints.Data.Contexts;
 using Microsoft.AspNetCore.Builder;
@@ -30,6 +31,7 @@ namespace Complaints.Api
         {
             services.AddDbContext<ComplaintsContext>(options => options.UseInMemoryDatabase(databaseName: "ComplaintsDb"));
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IComplaintService, ComplaintService>();
             services.AddControllers();
             services.AddMvc(options => options.EnableEndpointRouting = false);
         }
