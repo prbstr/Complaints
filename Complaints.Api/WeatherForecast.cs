@@ -1,6 +1,6 @@
 using System;
 
-namespace Complaints
+namespace Complaints.Api
 {
     public class WeatherForecast
     {
