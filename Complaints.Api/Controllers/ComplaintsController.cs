@@ -21,6 +21,13 @@ namespace Complaints.Api.Controllers
             _complaintService = complaintService;
         }
 
+        [HttpGet]
+        public IActionResult GetComplaints()
+        {
+            var complaints = _complaintService.GetAll();
+            return Ok(complaints);
+        }
+
         [Route("add")]
         [HttpPost]
         public IActionResult AddComplaint([FromBody]ComplaintDataModel complaintModel)
