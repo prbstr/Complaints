@@ -40,20 +40,15 @@ namespace Complaints.UnitTests.Services
         }
 
         [Theory]
-        [InlineData("Poor service", "The service is poor")]
-        public void ShouldThrowAnExceptionGivenIdIfItemNotFoundInDatabase(string title, string description)
+        [InlineData(21)]
+        public void ShouldThrowAnExceptionGivenIdIfItemNotFoundInDatabase(int complaintId)
         {
             // Arrange
             using var context = _serviceProvider.GetService<ComplaintsContext>();
             var complaintService = new ComplaintService(context);
-            var complaintEntity = new ComplaintEntity
-            {
-                Title = title,
-                Description = description
-            };
 
             // Act + Assert 
-            Assert.Throws<ComplaintException>(() => complaintService.GetComplaintById(21));
+            Assert.Throws<ComplaintException>(() => complaintService.GetComplaintById(complaintId));
         }
 
         [Theory]
