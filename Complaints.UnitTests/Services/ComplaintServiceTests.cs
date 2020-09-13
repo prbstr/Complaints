@@ -2,18 +2,49 @@
 using Complaints.Data.Contexts;
 using Complaints.Data.Entities;
 using Complaints.Data.ViewModels;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework.Constraints;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Xunit;
 
 namespace Complaints.UnitTests.Services
 {
-    public class ComplaintServiceTests : IClassFixture<DbFixture>
+    public class ComplaintServiceTests
     {
-        private readonly ServiceProvider _serviceProvider;
-        public ComplaintServiceTests(DbFixture fixture)
+        [Theory]
+        [InlineData("Poor food quality", "The food quality was poor")]
+        public void ShouldFetchAllComplaintsFromDb(string title, string description)
         {
-            _serviceProvider = fixture.ServiceProvider;
+            // Arrange
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
+            var complaintService = new ComplaintService(context);
+            var complaintEntityEntries = new List<EntityEntry<ComplaintEntity>>();
+            var complaintIds = new List<int>();
+
+            for (var i = 0; i < 5; i++)
+            {
+                complaintEntityEntries.Add(
+                    context.Complaints.Add(new ComplaintEntity
+                    {
+                        Title = title,
+                        Description = description
+                    }));
+            }
+
+            context.SaveChanges();
+
+            // Act
+            var complaintsInDb = complaintService.GetAll().ToList();
+
+            // Assert 
+            Assert.Equal(complaintsInDb.Count, complaintEntityEntries.Count);
+            foreach(var complaint in complaintEntityEntries)
+            {
+                Assert.NotNull(complaintsInDb.Find(x => x.Id == complaint.Entity.Id));
+            }
         }
 
         [Theory]
@@ -21,7 +52,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldFetchCorrectComplaintFromDb(string title, string description)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var complaintService = new ComplaintService(context);
             var complaintEntity = new ComplaintEntity
             {
@@ -44,7 +75,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldThrowAnExceptionGivenIdIfItemNotFoundInDatabase(int complaintId)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var complaintService = new ComplaintService(context);
 
             // Act + Assert 
@@ -56,7 +87,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldAddComplaintToDatabase(string title, string description)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var complaintService = new ComplaintService(context);
             var complaintEntity = new ComplaintEntity
             {
@@ -73,7 +104,5 @@ namespace Complaints.UnitTests.Services
             Assert.NotNull(complaintInDb);
             Assert.Equal(createdComplaint, complaintInDb);
         }
-
-
     }
 }

@@ -3,6 +3,7 @@ using Complaints.Data.Entities;
 using Complaints.Data.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Complaints.Core.Complaint
@@ -31,7 +32,7 @@ namespace Complaints.Core.Complaint
 
         public IEnumerable<ComplaintEntity> GetAll()
         {
-            throw new NotImplementedException();
+            return _context.Complaints;
         }
 
         public ComplaintEntity GetComplaintById(int id)
