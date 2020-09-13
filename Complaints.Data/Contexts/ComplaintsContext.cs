@@ -10,7 +10,6 @@ namespace Complaints.Data.Contexts
     {
         public ComplaintsContext(DbContextOptions<ComplaintsContext> options) : base(options)
         {
-
         }
 
         public DbSet<UserEntity> Users { get; set; }
