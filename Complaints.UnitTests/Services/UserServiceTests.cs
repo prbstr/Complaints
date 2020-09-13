@@ -1,8 +1,10 @@
 ﻿using Complaints.Core.User;
 using Complaints.Data.Contexts;
+using Complaints.Data.DataModels;
 using Complaints.Data.Entities;
 using Complaints.Data.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.Linq;
 using Xunit;
 
@@ -17,7 +19,11 @@ namespace Complaints.UnitTests.Services
             // Arrange 
             using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             {
-                var _userService = new UserService(context);
+                var authenticationOptions = Options.Create(new Authentication
+                {
+                    Secret = "mockSecret"
+                });
+                var _userService = new UserService(context, authenticationOptions);
                 var userEntity = new UserEntity
                 {
                     FirstName = firstName,
@@ -41,7 +47,11 @@ namespace Complaints.UnitTests.Services
         {
             // Arrange
             using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
-            var _userService = new UserService(context);
+            var authenticationOptions = Options.Create(new Authentication
+            {
+                Secret = "mockSecret"
+            });
+            var _userService = new UserService(context, authenticationOptions);
             var userEntity = new UserEntity
             {
                 FirstName = firstName,
@@ -59,7 +69,11 @@ namespace Complaints.UnitTests.Services
         {
             // Arrange
             using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
-            var _userService = new UserService(context);
+            var authenticationOptions = Options.Create(new Authentication
+            {
+                Secret = "mockSecret"
+            });
+            var _userService = new UserService(context, authenticationOptions);
             var userEntity1 = new UserEntity
             {
                 FirstName = firstName,
@@ -86,7 +100,11 @@ namespace Complaints.UnitTests.Services
         {
             // Arrange
             using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
-            var _userService = new UserService(context);
+            var authenticationOptions = Options.Create(new Authentication
+            {
+                Secret = "mockSecret"
+            });
+            var _userService = new UserService(context, authenticationOptions);
             var userEntity = new UserEntity
             {
                 FirstName = firstName,
@@ -109,7 +127,11 @@ namespace Complaints.UnitTests.Services
         {
             // Arrange
             using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
-            var _userService = new UserService(context);
+            var authenticationOptions = Options.Create(new Authentication
+            {
+                Secret = "mockSecret"
+            });
+            var _userService = new UserService(context, authenticationOptions);
             var userEntity = new UserEntity
             {
                 FirstName = "name",
@@ -129,7 +151,11 @@ namespace Complaints.UnitTests.Services
         {
             // Arrange
             using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
-            var _userService = new UserService(context);
+            var authenticationOptions = Options.Create(new Authentication
+            {
+                Secret = "mockSecret"
+            });
+            var _userService = new UserService(context, authenticationOptions);
             var userEntity = new UserEntity
             {
                 FirstName = "name",
