@@ -2,7 +2,11 @@
 using Complaints.Data.Contexts;
 using Complaints.Data.Entities;
 using Complaints.Data.ViewModels;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework.Constraints;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Xunit;
 
@@ -14,6 +18,39 @@ namespace Complaints.UnitTests.Services
         public ComplaintServiceTests(DbFixture fixture)
         {
             _serviceProvider = fixture.ServiceProvider;
+        }
+
+        [Theory]
+        [InlineData("Poor food quality", "The food quality was poor")]
+        public void ShouldFetchAllComplaintsFromDb(string title, string description)
+        {
+            // Arrange
+            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            var complaintService = new ComplaintService(context);
+            var complaintEntityEntries = new List<EntityEntry<ComplaintEntity>>();
+            var complaintIds = new List<int>();
+
+            for (var i = 0; i < 5; i++)
+            {
+                complaintEntityEntries.Add(
+                    context.Complaints.Add(new ComplaintEntity
+                    {
+                        Title = title,
+                        Description = description
+                    }));
+            }
+
+            context.SaveChanges();
+
+            // Act
+            var complaintsInDb = complaintService.GetAll().ToList();
+
+            // Assert 
+            Assert.Equal(complaintsInDb.Count, complaintEntityEntries.Count);
+            foreach(var complaint in complaintEntityEntries)
+            {
+                Assert.NotNull(complaintsInDb.Find(x => x.Id == complaint.Entity.Id));
+            }
         }
 
         [Theory]
@@ -73,7 +110,5 @@ namespace Complaints.UnitTests.Services
             Assert.NotNull(complaintInDb);
             Assert.Equal(createdComplaint, complaintInDb);
         }
-
-
     }
 }
