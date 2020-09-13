@@ -10,6 +10,7 @@ namespace Complaints.Core.User
     public interface IUserService
     {
         IEnumerable<UserEntity> GetAll();
+        UserEntity GetUserById(int id);
         UserEntity Authenticate(string username, string password);
         UserEntity Create(UserEntity user, string password);
     }
@@ -74,6 +75,12 @@ namespace Complaints.Core.User
         public IEnumerable<UserEntity> GetAll()
         {
             return _context.Users.ToList();
+        }
+
+        public UserEntity GetUserById(int id)
+        {
+            var user = _context.Users.Find(id);
+            return user != null ? user : throw new AuthenticationException($"User with id: {id} not found");
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
