@@ -4,12 +4,7 @@ using Complaints.Data.Entities;
 using Complaints.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
 using Xunit;
 
 namespace Complaints.UnitTests.Services
