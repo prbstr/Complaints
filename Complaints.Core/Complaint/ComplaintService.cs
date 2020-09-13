@@ -1,5 +1,6 @@
 ﻿using Complaints.Data.Contexts;
 using Complaints.Data.Entities;
+using Complaints.Data.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,7 +36,9 @@ namespace Complaints.Core.Complaint
 
         public ComplaintEntity GetComplaintById(int id)
         {
-            return _context.Complaints.Find(id);
+            var complaint = _context.Complaints.Find(id);
+
+            return complaint != null ? complaint : throw new ComplaintException($"Complaint with id: {id} cannot be found");
         }
     }
 }
