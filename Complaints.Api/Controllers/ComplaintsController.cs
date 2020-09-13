@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Complaints.Core.Complaint;
 using Complaints.Data.DataModels;
 using Complaints.Data.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,7 @@ namespace Complaints.Api.Controllers
             _complaintService = complaintService;
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult GetComplaints()
         {
@@ -28,6 +30,7 @@ namespace Complaints.Api.Controllers
             return Ok(complaints);
         }
 
+        [Authorize]
         [Route("add")]
         [HttpPost]
         public IActionResult AddComplaint([FromBody]ComplaintDataModel complaintModel)
