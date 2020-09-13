@@ -31,7 +31,7 @@ namespace Complaints.Api
             services.AddDbContext<ComplaintsContext>(options => options.UseInMemoryDatabase(databaseName: "ComplaintsDb"));
             services.AddScoped<IUserService, UserService>();
             services.AddControllers();
-            services.AddMvc();
+            services.AddMvc(options => options.EnableEndpointRouting = false);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,10 +48,7 @@ namespace Complaints.Api
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseMvc();
         }
     }
 }
