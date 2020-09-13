@@ -2,28 +2,12 @@
 using Complaints.Data.Contexts;
 using Complaints.Data.Entities;
 using Complaints.Data.ViewModels;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using Xunit;
 
 namespace Complaints.UnitTests.Services
 {
-    public class DbFixture
-    {
-        public ServiceProvider ServiceProvider { get; private set; }
-        public DbFixture()
-        {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddDbContext<ComplaintsContext>(options =>
-                options.UseInMemoryDatabase("testDb"),
-                ServiceLifetime.Transient
-            );
-
-            ServiceProvider = serviceCollection.BuildServiceProvider();
-        }
-    }
-
     public class UserServiceTests : IClassFixture<DbFixture>
     {
         private readonly ServiceProvider _serviceProvider;
