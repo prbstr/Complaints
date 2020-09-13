@@ -2,28 +2,12 @@
 using Complaints.Data.Contexts;
 using Complaints.Data.Entities;
 using Complaints.Data.ViewModels;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using Xunit;
 
 namespace Complaints.UnitTests.Services
 {
-    public class DbFixture
-    {
-        public ServiceProvider ServiceProvider { get; private set; }
-        public DbFixture()
-        {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddDbContext<ComplaintsContext>(options =>
-                options.UseInMemoryDatabase("testDb"),
-                ServiceLifetime.Transient
-            );
-
-            ServiceProvider = serviceCollection.BuildServiceProvider();
-        }
-    }
-
     public class UserServiceTests : IClassFixture<DbFixture>
     {
         private readonly ServiceProvider _serviceProvider;
@@ -37,21 +21,23 @@ namespace Complaints.UnitTests.Services
         public void ShouldCreateNewUserInInMemoryDatabase(string firstName, string lastName, string username, string password)
         {
             // Arrange 
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
-            var _userService = new UserService(context);
-            var userEntity = new UserEntity
+            using (var context = _serviceProvider.GetService<ComplaintsContext>())
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Username = username
-            };
+                var _userService = new UserService(context);
+                var userEntity = new UserEntity
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Username = username
+                };
 
-            // Act
-            var createdUser = _userService.Create(userEntity, password);
+                // Act
+                var createdUser = _userService.Create(userEntity, password);
 
-            // Assert
-            var userInDb = _userService.GetAll().First();
-            Assert.Equal(createdUser, userInDb);
+                // Assert
+                var userInDb = _userService.GetUserById(createdUser.Id);
+                Assert.Equal(createdUser, userInDb);
+            }
         }
 
         [Theory]
@@ -74,7 +60,7 @@ namespace Complaints.UnitTests.Services
         }
 
         [Theory]
-        [InlineData("name", "surname", "username", "password")]
+        [InlineData("name", "surname", "username0", "password")]
         public void ShouldThrowAnExceptionIfUsernameIsTaken(string firstName, string lastName, string username, string password)
         {
             // Arrange
@@ -89,9 +75,9 @@ namespace Complaints.UnitTests.Services
 
             var userEntity2 = new UserEntity
             {
-                FirstName = "name",
-                LastName = "surname",
-                Username = "username"
+                FirstName = "testname",
+                LastName = "testsurname",
+                Username = username
             };
 
             var user1 = _userService.Create(userEntity1, password);
@@ -101,7 +87,7 @@ namespace Complaints.UnitTests.Services
         }
 
         [Theory]
-        [InlineData("name", "surname", "username", "password")]
+        [InlineData("name", "surname", "username1", "password")]
         public void ShouldAuthenticateUserGivenCredentialsAreCorrect(string firstName, string lastName, string username, string password)
         {
             // Arrange
@@ -124,7 +110,7 @@ namespace Complaints.UnitTests.Services
         }
 
         [Theory]
-        [InlineData("username", "wrongpassword")]
+        [InlineData("username2", "wrongpassword")]
         public void ShouldThrowAnAuthenticationExceptionGivenPasswordIsIncorrect(string username, string password)
         {
             // Arrange
@@ -154,7 +140,7 @@ namespace Complaints.UnitTests.Services
             {
                 FirstName = "name",
                 LastName = "surname",
-                Username = "username"
+                Username = "username3"
             };
 
             var registeredUser = _userService.Create(userEntity, password);
