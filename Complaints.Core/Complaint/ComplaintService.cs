@@ -21,9 +21,11 @@ namespace Complaints.Core.Complaint
             _context = context;
         }
 
-        public ComplaintEntity AddComplaint(ComplaintEntity complaint)
+        public ComplaintEntity AddComplaint(ComplaintEntity complaintEntity)
         {
-            throw new NotImplementedException();
+            var complaint = _context.Add(complaintEntity);
+            _context.SaveChanges();
+            return complaint.Entity;
         }
 
         public IEnumerable<ComplaintEntity> GetAll()
@@ -33,7 +35,7 @@ namespace Complaints.Core.Complaint
 
         public ComplaintEntity GetComplaintById(int id)
         {
-            throw new NotImplementedException();
+            return _context.Complaints.Find(id);
         }
     }
 }
