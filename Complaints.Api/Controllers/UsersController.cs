@@ -23,6 +23,7 @@ namespace Complaints.Api.Controllers
             _userService = userService;
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult GetAll()
         {
