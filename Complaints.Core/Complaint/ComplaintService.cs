@@ -17,7 +17,7 @@ namespace Complaints.Core.Complaint
 
     public class ComplaintService : IComplaintService
     {
-        private ComplaintsContext _context;
+        private readonly ComplaintsContext _context;
         public ComplaintService(ComplaintsContext context)
         {
             _context = context;
@@ -39,7 +39,7 @@ namespace Complaints.Core.Complaint
         {
             var complaint = _context.Complaints.Find(id);
 
-            return complaint != null ? complaint : throw new ComplaintException($"Complaint with id: {id} cannot be found");
+            return complaint ?? throw new ComplaintException($"Complaint with id: {id} cannot be found");
         }
     }
 }
