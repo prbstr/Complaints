@@ -1,26 +1,37 @@
 ﻿using Complaints.Data.Contexts;
+using Complaints.Data.DataModels;
 using Complaints.Data.Entities;
 using Complaints.Data.ViewModels;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 
 namespace Complaints.Core.User
 {
     public interface IUserService
     {
         IEnumerable<UserEntity> GetAll();
-        UserEntity GetUserById(int id);
-        UserEntity Authenticate(string username, string password);
         UserEntity Create(UserEntity user, string password);
+        UserEntity Authenticate(string username, string password);
+        string GenerateToken(UserEntity user);
+        UserEntity GetUserById(int id);
     }
 
     public class UserService : IUserService
     {
         private readonly ComplaintsContext _context;
-        public UserService(ComplaintsContext context)
+        private readonly Authentication _authenticationSettings;
+        public UserService(
+            ComplaintsContext context,
+            IOptions<Authentication> authenticationSettings)
         {
             _context = context;
+            _authenticationSettings = authenticationSettings.Value;
         }
 
         public UserEntity Authenticate(string username, string password)
@@ -90,6 +101,23 @@ namespace Complaints.Core.User
             using var hmac = new System.Security.Cryptography.HMACSHA512();
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        }
+
+        public string GenerateToken(UserEntity user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_authenticationSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)

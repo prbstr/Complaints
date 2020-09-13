@@ -57,7 +57,15 @@ namespace Complaints.Api.Controllers
             try
             {
                 var user = _userService.Authenticate(userAuthenticationModel.Username, userAuthenticationModel.Password);
-                return Ok(user);
+                var tokenString = _userService.GenerateToken(user);
+                return Ok(new
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Username = user.Username,
+                    Token = tokenString
+                });
             }
             catch (AuthenticationException ex)
             {
