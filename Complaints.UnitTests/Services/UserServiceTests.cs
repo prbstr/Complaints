@@ -162,6 +162,5 @@ namespace Complaints.UnitTests.Services
             // Act + Assert
             Assert.Throws<AuthenticationException>(() => _userService.Authenticate(username, password));
         }
-
     }
 }
