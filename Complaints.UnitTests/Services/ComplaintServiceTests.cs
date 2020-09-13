@@ -12,20 +12,14 @@ using Xunit;
 
 namespace Complaints.UnitTests.Services
 {
-    public class ComplaintServiceTests : IClassFixture<DbFixture>
+    public class ComplaintServiceTests
     {
-        private readonly ServiceProvider _serviceProvider;
-        public ComplaintServiceTests(DbFixture fixture)
-        {
-            _serviceProvider = fixture.ServiceProvider;
-        }
-
         [Theory]
         [InlineData("Poor food quality", "The food quality was poor")]
         public void ShouldFetchAllComplaintsFromDb(string title, string description)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var complaintService = new ComplaintService(context);
             var complaintEntityEntries = new List<EntityEntry<ComplaintEntity>>();
             var complaintIds = new List<int>();
@@ -58,7 +52,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldFetchCorrectComplaintFromDb(string title, string description)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var complaintService = new ComplaintService(context);
             var complaintEntity = new ComplaintEntity
             {
@@ -81,7 +75,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldThrowAnExceptionGivenIdIfItemNotFoundInDatabase(int complaintId)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var complaintService = new ComplaintService(context);
 
             // Act + Assert 
@@ -93,7 +87,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldAddComplaintToDatabase(string title, string description)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var complaintService = new ComplaintService(context);
             var complaintEntity = new ComplaintEntity
             {

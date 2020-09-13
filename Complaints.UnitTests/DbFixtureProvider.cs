@@ -1,4 +1,5 @@
 ﻿using Complaints.Data.Contexts;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -7,18 +8,23 @@ using System.Text;
 
 namespace Complaints.UnitTests
 {
-    public class DbFixture
+    public static class DbFixtureProvider
     {
-        public ServiceProvider ServiceProvider { get; private set; }
-        public DbFixture()
+        public static DbContextOptions<ComplaintsContext> CreateNewContextOptions()
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddDbContext<ComplaintsContext>(options =>
-                options.UseInMemoryDatabase("testDb"),
-                ServiceLifetime.Transient
-            );
+            // Create a fresh service provider, and therefore a fresh 
+            // InMemory database instance.
+            var serviceProvider = new ServiceCollection()
+                .AddEntityFrameworkInMemoryDatabase()
+                .BuildServiceProvider();
 
-            ServiceProvider = serviceCollection.BuildServiceProvider();
+            // Create a new options instance telling the context to use an
+            // InMemory database and the new service provider.
+            var builder = new DbContextOptionsBuilder<ComplaintsContext>();
+            builder.UseInMemoryDatabase("testDb")
+                   .UseInternalServiceProvider(serviceProvider);
+
+            return builder.Options;
         }
     }
 }

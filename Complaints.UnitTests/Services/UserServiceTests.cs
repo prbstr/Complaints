@@ -8,20 +8,14 @@ using Xunit;
 
 namespace Complaints.UnitTests.Services
 {
-    public class UserServiceTests : IClassFixture<DbFixture>
+    public class UserServiceTests
     {
-        private readonly ServiceProvider _serviceProvider;
-        public UserServiceTests(DbFixture fixture)
-        {
-            _serviceProvider = fixture.ServiceProvider;
-        }
-
         [Theory]
         [InlineData("name", "surname", "username", "password")]
         public void ShouldCreateNewUserInInMemoryDatabase(string firstName, string lastName, string username, string password)
         {
             // Arrange 
-            using (var context = _serviceProvider.GetService<ComplaintsContext>())
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             {
                 var _userService = new UserService(context);
                 var userEntity = new UserEntity
@@ -46,7 +40,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldThrowAnAuthenticationExceptionIfPasswordIsEmpty(string firstName, string lastName, string username, string password)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var _userService = new UserService(context);
             var userEntity = new UserEntity
             {
@@ -64,7 +58,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldThrowAnExceptionIfUsernameIsTaken(string firstName, string lastName, string username, string password)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var _userService = new UserService(context);
             var userEntity1 = new UserEntity
             {
@@ -91,7 +85,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldAuthenticateUserGivenCredentialsAreCorrect(string firstName, string lastName, string username, string password)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var _userService = new UserService(context);
             var userEntity = new UserEntity
             {
@@ -114,7 +108,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldThrowAnAuthenticationExceptionGivenPasswordIsIncorrect(string username, string password)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var _userService = new UserService(context);
             var userEntity = new UserEntity
             {
@@ -134,7 +128,7 @@ namespace Complaints.UnitTests.Services
         public void ShouldThrowAnAuthenticationExceptionGivenUsernameIsIncorrect(string username, string password)
         {
             // Arrange
-            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            using var context = new ComplaintsContext(DbFixtureProvider.CreateNewContextOptions());
             var _userService = new UserService(context);
             var userEntity = new UserEntity
             {
