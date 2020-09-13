@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Complaints.Core.User;
+using Complaints.Data.DataModels;
+using Complaints.Data.Entities;
+using Complaints.Data.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +28,22 @@ namespace Complaints.Api.Controllers
         {
             var users = _userService.GetAll();
             return Ok(users);
+        }
+
+        [Route("register")]
+        [HttpPost]
+        public IActionResult CreateUser([FromBody]RegisterDataModel userRegistrationModel)
+        {
+            try
+            {
+                var userEntity = UserEntity.MapToEntity(userRegistrationModel);
+                var user = _userService.Create(userEntity, userRegistrationModel.Password);
+                return Ok();
+            }
+            catch (AuthenticationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
