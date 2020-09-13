@@ -1,7 +1,9 @@
 ﻿using Complaints.Core.Complaint;
 using Complaints.Data.Contexts;
 using Complaints.Data.Entities;
+using Complaints.Data.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using Xunit;
 
 namespace Complaints.UnitTests.Services
@@ -14,26 +16,69 @@ namespace Complaints.UnitTests.Services
             _serviceProvider = fixture.ServiceProvider;
         }
 
-        [Fact]
-        public void ShouldAddComplaintToDatabase()
+        [Theory]
+        [InlineData("Poor service", "The service is poor")]
+        public void ShouldFetchCorrectComplaintFromDb(string title, string description)
         {
             // Arrange
             using var context = _serviceProvider.GetService<ComplaintsContext>();
             var complaintService = new ComplaintService(context);
             var complaintEntity = new ComplaintEntity
             {
-                Title = "Poor service",
-                Description = "The service is poor"
+                Title = title,
+                Description = description
+            };
+
+            var createdComplaint = context.Complaints.Add(complaintEntity);
+            context.SaveChanges();
+
+            // Act
+            var complaintInDb = complaintService.GetComplaintById(createdComplaint.Entity.Id);
+
+            // Assert 
+            Assert.Equal(complaintInDb, createdComplaint.Entity);
+        }
+
+        [Theory]
+        [InlineData("Poor service", "The service is poor")]
+        public void ShouldThrowAnExceptionGivenIdIfItemNotFoundInDatabase(string title, string description)
+        {
+            // Arrange
+            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            var complaintService = new ComplaintService(context);
+            var complaintEntity = new ComplaintEntity
+            {
+                Title = title,
+                Description = description
+            };
+
+            // Act + Assert 
+            Assert.Throws<ComplaintException>(() => complaintService.GetComplaintById(21));
+        }
+
+        [Theory]
+        [InlineData("Poor service", "The service is poor")]
+        public void ShouldAddComplaintToDatabase(string title, string description)
+        {
+            // Arrange
+            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            var complaintService = new ComplaintService(context);
+            var complaintEntity = new ComplaintEntity
+            {
+                Title = title,
+                Description = description
             };
 
             // Act
             var createdComplaint = complaintService.AddComplaint(complaintEntity);
 
             // Assert
-            var complaintInDb = complaintService.GetComplaintById(createdComplaint.Id);
+            var complaintInDb = context.Complaints.Find(createdComplaint.Id);
 
             Assert.NotNull(complaintInDb);
             Assert.Equal(createdComplaint, complaintInDb);
         }
+
+
     }
 }

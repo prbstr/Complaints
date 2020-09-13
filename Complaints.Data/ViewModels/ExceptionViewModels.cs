@@ -18,4 +18,19 @@ namespace Complaints.Data.ViewModels
         {
         }
     }
+
+    public class ComplaintException : Exception
+    {
+        public ComplaintException() : base()
+        {
+        }
+
+        public ComplaintException(string message) : base(message)
+        {
+        }
+
+        public ComplaintException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+    }
 }
