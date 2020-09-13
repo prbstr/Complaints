@@ -122,5 +122,46 @@ namespace Complaints.UnitTests.Services
             // Assert
             Assert.Equal(registeredUser, loggedInUser);
         }
+
+        [Theory]
+        [InlineData("username", "wrongpassword")]
+        public void ShouldThrowAnAuthenticationExceptionGivenPasswordIsIncorrect(string username, string password)
+        {
+            // Arrange
+            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            var _userService = new UserService(context);
+            var userEntity = new UserEntity
+            {
+                FirstName = "name",
+                LastName = "surname",
+                Username = username
+            };
+
+            var registeredUser = _userService.Create(userEntity, "password");
+
+            // Act + Assert
+            Assert.Throws<AuthenticationException>(() => _userService.Authenticate(username, password));
+        }
+
+        [Theory]
+        [InlineData("wrongusername", "password")]
+        public void ShouldThrowAnAuthenticationExceptionGivenUsernameIsIncorrect(string username, string password)
+        {
+            // Arrange
+            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            var _userService = new UserService(context);
+            var userEntity = new UserEntity
+            {
+                FirstName = "name",
+                LastName = "surname",
+                Username = "username"
+            };
+
+            var registeredUser = _userService.Create(userEntity, password);
+
+            // Act + Assert
+            Assert.Throws<AuthenticationException>(() => _userService.Authenticate(username, password));
+        }
+
     }
 }
