@@ -44,6 +44,29 @@ namespace Complaints.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [Route("login")]
+        [HttpPost]
+        public IActionResult AuthenticateUser([FromBody]AuthenticateDataModel userAuthenticationModel)
+        {
+            try
+            {
+                var user = _userService.Authenticate(userAuthenticationModel.Username, userAuthenticationModel.Password);
+                return Ok(user);
+            }
+            catch (AuthenticationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }
