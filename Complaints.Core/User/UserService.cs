@@ -89,8 +89,16 @@ namespace Complaints.Core.User
 
         public UserEntity GetUserById(int id)
         {
-            var user = _context.Users.Find(id);
-            return user ?? throw new AuthenticationException($"User with id: {id} not found");
+            try
+            {
+                var user = _context.Users.Find(id);
+                return user ?? throw new AuthenticationException($"User with id: {id} not found");
+            }
+            catch (AuthenticationException ex)
+            {
+                // Log authentication exception here
+                return null;
+            }
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
