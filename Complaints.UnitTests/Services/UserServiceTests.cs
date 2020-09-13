@@ -36,6 +36,7 @@ namespace Complaints.UnitTests.Services
         [InlineData("name", "surname", "username", "password")]
         public void ShouldCreateNewUserInInMemoryDatabase(string firstName, string lastName, string username, string password)
         {
+            // Arrange 
             using var context = _serviceProvider.GetService<ComplaintsContext>();
             var _userService = new UserService(context);
             var userEntity = new UserEntity
@@ -45,8 +46,10 @@ namespace Complaints.UnitTests.Services
                 Username = username
             };
 
+            // Act
             var createdUser = _userService.Create(userEntity, password);
 
+            // Assert
             var userInDb = _userService.GetAll().First();
             Assert.Equal(createdUser, userInDb);
         }
@@ -56,6 +59,7 @@ namespace Complaints.UnitTests.Services
         [InlineData("name", "surname", "username", null)]
         public void ShouldThrowAnAuthenticationExceptionIfPasswordIsEmpty(string firstName, string lastName, string username, string password)
         {
+            // Arrange
             using var context = _serviceProvider.GetService<ComplaintsContext>();
             var _userService = new UserService(context);
             var userEntity = new UserEntity
@@ -65,6 +69,7 @@ namespace Complaints.UnitTests.Services
                 Username = username
             };
 
+            // Act + Assert
             Assert.Throws<AuthenticationException>(() => _userService.Create(userEntity, password));
         }
 
@@ -72,6 +77,7 @@ namespace Complaints.UnitTests.Services
         [InlineData("name", "surname", "username", "password")]
         public void ShouldThrowAnExceptionIfUsernameIsTaken(string firstName, string lastName, string username, string password)
         {
+            // Arrange
             using var context = _serviceProvider.GetService<ComplaintsContext>();
             var _userService = new UserService(context);
             var userEntity1 = new UserEntity
@@ -89,7 +95,32 @@ namespace Complaints.UnitTests.Services
             };
 
             var user1 = _userService.Create(userEntity1, password);
+
+            // Act + Assert
             Assert.Throws<AuthenticationException>(() => _userService.Create(userEntity2, password));
+        }
+
+        [Theory]
+        [InlineData("name", "surname", "username", "password")]
+        public void ShouldAuthenticateUserGivenCredentialsAreCorrect(string firstName, string lastName, string username, string password)
+        {
+            // Arrange
+            using var context = _serviceProvider.GetService<ComplaintsContext>();
+            var _userService = new UserService(context);
+            var userEntity = new UserEntity
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Username = username
+            };
+
+            var registeredUser = _userService.Create(userEntity, password);
+
+            // Act 
+            var loggedInUser = _userService.Authenticate(registeredUser.Username, password);
+
+            // Assert
+            Assert.Equal(registeredUser, loggedInUser);
         }
     }
 }
