@@ -19,14 +19,14 @@ GET: /api/complaints
 POST: /api/complaints/add
 
 ## Features
-Register new user
-Login with user
-Get all users
-Add complaint
-Fetch all complaints
+- Register new user
+- Login with user
+- Get all users
+- Add complaint
+- Fetch all complaints
 
 ## Out of scope
-Attach a user to a complaint
-Update or delete users
-Update or delete complaints
-Roles and claims
+- Attach a user to a complaint
+- Update or delete users
+- Update or delete complaints
+- Roles and claims
